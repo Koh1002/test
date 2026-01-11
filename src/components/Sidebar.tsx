@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import {
   ChevronDown,
-  ChevronRight,
   BookOpen,
   CheckCircle,
   Circle,
@@ -32,28 +31,28 @@ export function Sidebar({ onSelectLesson, currentChapterId, currentLessonId }: S
   const progressPercentage = getProgressPercentage();
 
   return (
-    <div className="w-72 bg-gray-900 text-white h-full flex flex-col">
+    <div className="w-80 bg-gradient-to-b from-slate-900 via-indigo-950 to-slate-900 text-white h-full flex flex-col shadow-xl">
       {/* Header */}
-      <div className="p-4 border-b border-gray-700">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <GraduationCap size={24} />
+      <div className="p-5 border-b border-white/10">
+        <div className="flex items-center gap-3 mb-5">
+          <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+            <GraduationCap size={26} />
           </div>
           <div>
             <h1 className="font-bold text-lg">Python学習</h1>
-            <p className="text-xs text-gray-400">ゼロから始めるデータ分析</p>
+            <p className="text-xs text-indigo-300">ゼロから始めるデータ分析</p>
           </div>
         </div>
 
         {/* Progress Bar */}
-        <div className="mt-4">
-          <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>学習進捗</span>
-            <span>{progressPercentage}%</span>
+        <div className="mt-4 bg-white/5 rounded-xl p-4">
+          <div className="flex justify-between text-xs mb-2">
+            <span className="text-indigo-300">学習進捗</span>
+            <span className="text-white font-medium">{progressPercentage}%</span>
           </div>
-          <div className="progress-bar">
+          <div className="h-2 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="progress-bar-fill"
+              className="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 transition-all duration-500"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
@@ -61,7 +60,7 @@ export function Sidebar({ onSelectLesson, currentChapterId, currentLessonId }: S
       </div>
 
       {/* Chapter List */}
-      <div className="flex-1 overflow-y-auto py-2">
+      <div className="flex-1 overflow-y-auto py-3">
         {chapters.map((chapter) => (
           <ChapterItem
             key={chapter.id}
@@ -76,8 +75,8 @@ export function Sidebar({ onSelectLesson, currentChapterId, currentLessonId }: S
       </div>
 
       {/* Footer */}
-      <div className="p-4 border-t border-gray-700">
-        <p className="text-xs text-gray-500 text-center">
+      <div className="p-4 border-t border-white/10">
+        <p className="text-xs text-indigo-400/60 text-center">
           Powered by React + TypeScript
         </p>
       </div>
@@ -110,24 +109,28 @@ function ChapterItem({
     <div className="mb-1">
       <button
         onClick={onToggle}
-        className="w-full px-4 py-3 flex items-center gap-2 hover:bg-gray-800 transition-colors text-left"
+        className="w-full px-5 py-3.5 flex items-center gap-3 hover:bg-white/5 transition-colors text-left group"
       >
-        {isExpanded ? (
-          <ChevronDown size={16} className="text-gray-400" />
-        ) : (
-          <ChevronRight size={16} className="text-gray-400" />
-        )}
-        <BookOpen size={16} className={isAllComplete ? 'text-green-500' : 'text-indigo-400'} />
+        <span className={`transition-transform duration-200 ${isExpanded ? 'rotate-0' : '-rotate-90'}`}>
+          <ChevronDown size={16} className="text-indigo-400" />
+        </span>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+          isAllComplete
+            ? 'bg-gradient-to-br from-green-500 to-emerald-600'
+            : 'bg-gradient-to-br from-indigo-500/20 to-purple-500/20'
+        }`}>
+          <BookOpen size={16} className={isAllComplete ? 'text-white' : 'text-indigo-400'} />
+        </div>
         <div className="flex-1">
-          <div className="text-sm font-medium">{chapter.title}</div>
-          <div className="text-xs text-gray-500">
+          <div className="text-sm font-medium group-hover:text-white transition-colors">{chapter.title}</div>
+          <div className="text-xs text-indigo-400/60">
             {completedCount}/{totalCount} レッスン完了
           </div>
         </div>
       </button>
 
       {isExpanded && (
-        <div className="ml-6 border-l border-gray-700">
+        <div className="ml-8 pl-4 border-l border-indigo-500/20">
           {chapter.lessons.map((lesson) => {
             const isComplete = isLessonComplete(lesson.id);
             const isCurrent = lesson.id === currentLessonId;
@@ -136,16 +139,16 @@ function ChapterItem({
               <button
                 key={lesson.id}
                 onClick={() => onSelectLesson(chapter.id, lesson.id)}
-                className={`w-full px-4 py-2 flex items-center gap-2 text-left transition-colors ${
+                className={`w-full px-4 py-2.5 flex items-center gap-3 text-left transition-all rounded-lg my-0.5 ${
                   isCurrent
-                    ? 'bg-indigo-600 text-white'
-                    : 'hover:bg-gray-800 text-gray-300'
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg'
+                    : 'hover:bg-white/5 text-indigo-200'
                 }`}
               >
                 {isComplete ? (
-                  <CheckCircle size={14} className="text-green-500" />
+                  <CheckCircle size={14} className={isCurrent ? 'text-white' : 'text-green-400'} />
                 ) : (
-                  <Circle size={14} className="text-gray-500" />
+                  <Circle size={14} className={isCurrent ? 'text-white/70' : 'text-indigo-500/50'} />
                 )}
                 <span className="text-sm truncate">{lesson.title}</span>
               </button>
