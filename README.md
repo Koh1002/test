@@ -12,13 +12,13 @@
 - Pythonを学びたい方
 
 ### ゴール
-- Google Colaboratory上でPythonプログラミングができる
-- 統計的なデータ分析がPythonで実行できる
+- VS Code上でPythonプログラミングができる
+- Jupyter Notebook形式で統計的なデータ分析がPythonで実行できる
 
 ## 学習コンテンツ
 
 ### 基礎編
-1. **環境構築** - Google Colaboratoryの使い方
+1. **環境構築** - VS CodeとPythonのセットアップ
 2. **Python基礎** - 変数とprint文
 3. **条件分岐** - if文
 4. **繰り返し処理** - for文・while文
