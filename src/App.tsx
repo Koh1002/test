@@ -4,7 +4,7 @@ import { LessonContent } from './components/LessonContent';
 import { AIChat } from './components/AIChat';
 import { Header } from './components/Header';
 import { ProgressProvider, useProgress } from './context/ProgressContext';
-import { AIProvider } from './context/AIContext';
+import { AIProvider, useAI } from './context/AIContext';
 import { getLesson, chapters } from './content/chapters';
 import type { Lesson } from './types';
 
@@ -27,16 +27,16 @@ class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryStat
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-red-50 flex items-center justify-center p-8">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl">
+        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-8">
+          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl">
             <h1 className="text-2xl font-bold text-red-600 mb-4">エラーが発生しました</h1>
             <p className="text-gray-700 mb-4">アプリケーションの読み込み中にエラーが発生しました。</p>
-            <pre className="bg-gray-100 p-4 rounded text-sm overflow-auto">
+            <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-auto">
               {this.state.error?.message}
             </pre>
             <button
               onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+              className="mt-4 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
             >
               ページを再読み込み
             </button>
@@ -51,6 +51,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryStat
 
 function AppContent() {
   const { progress, setCurrentLesson } = useProgress();
+  const { isChatOpen } = useAI();
   const [currentChapterId, setCurrentChapterId] = useState(progress.currentChapter);
   const [currentLessonId, setCurrentLessonId] = useState(progress.currentLesson);
   const [currentLesson, setCurrentLessonData] = useState<Lesson | null>(null);
@@ -60,7 +61,6 @@ function AppContent() {
     if (lesson) {
       setCurrentLessonData(lesson);
     } else {
-      // Default to first lesson if not found
       const firstChapter = chapters[0];
       const firstLesson = firstChapter.lessons[0];
       setCurrentChapterId(firstChapter.id);
@@ -76,23 +76,41 @@ function AppContent() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
       <Header />
       <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar */}
         <Sidebar
           onSelectLesson={handleSelectLesson}
           currentChapterId={currentChapterId}
           currentLessonId={currentLessonId}
         />
-        {currentLesson && (
-          <LessonContent
-            lesson={currentLesson}
-            chapterId={currentChapterId}
-            onNavigate={handleSelectLesson}
-          />
-        )}
+
+        {/* Main Content with padding */}
+        <div className="flex-1 flex overflow-hidden">
+          <div className="flex-1 p-6 overflow-hidden">
+            <div className="h-full bg-white rounded-2xl shadow-lg overflow-hidden">
+              {currentLesson && (
+                <LessonContent
+                  lesson={currentLesson}
+                  chapterId={currentChapterId}
+                  onNavigate={handleSelectLesson}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* AI Chat Pane */}
+          {isChatOpen && (
+            <div className="w-96 p-6 pl-0 overflow-hidden">
+              <AIChat />
+            </div>
+          )}
+        </div>
       </div>
-      <AIChat />
+
+      {/* Floating button when chat is closed */}
+      {!isChatOpen && <AIChat />}
     </div>
   );
 }
