@@ -27,16 +27,16 @@ class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryStat
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center p-8">
-          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-2xl">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-100 flex items-center justify-center p-8">
+          <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-2xl border border-slate-100">
             <h1 className="text-2xl font-bold text-red-600 mb-4">エラーが発生しました</h1>
-            <p className="text-gray-700 mb-4">アプリケーションの読み込み中にエラーが発生しました。</p>
-            <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-auto">
+            <p className="text-slate-600 mb-4">アプリケーションの読み込み中にエラーが発生しました。</p>
+            <pre className="bg-slate-50 p-4 rounded-xl text-sm overflow-auto border border-slate-200 text-slate-700">
               {this.state.error?.message}
             </pre>
             <button
               onClick={() => window.location.reload()}
-              className="mt-4 px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all"
+              className="mt-6 px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl font-medium hover:shadow-lg hover:shadow-indigo-200 transition-all"
             >
               ページを再読み込み
             </button>
@@ -76,9 +76,9 @@ function AppContent() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-50 via-indigo-50 to-purple-50">
+    <div className="h-screen flex flex-col bg-gradient-to-br from-slate-100 via-indigo-50 to-purple-100 overflow-hidden">
       <Header />
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
         <Sidebar
           onSelectLesson={handleSelectLesson}
@@ -86,30 +86,29 @@ function AppContent() {
           currentLessonId={currentLessonId}
         />
 
-        {/* Main Content with padding */}
-        <div className="flex-1 flex overflow-hidden">
-          <div className="flex-1 p-6 overflow-hidden">
-            <div className="h-full bg-white rounded-2xl shadow-lg overflow-hidden">
-              {currentLesson && (
-                <LessonContent
-                  lesson={currentLesson}
-                  chapterId={currentChapterId}
-                  onNavigate={handleSelectLesson}
-                />
-              )}
-            </div>
+        {/* Main Content Area */}
+        <main className="flex-1 flex min-h-0 p-6 gap-6">
+          {/* Lesson Content */}
+          <div className="flex-1 min-h-0 min-w-0 bg-white rounded-3xl shadow-xl shadow-indigo-100/50 border border-white/50 overflow-hidden">
+            {currentLesson && (
+              <LessonContent
+                lesson={currentLesson}
+                chapterId={currentChapterId}
+                onNavigate={handleSelectLesson}
+              />
+            )}
           </div>
 
-          {/* AI Chat Pane */}
+          {/* AI Chat Panel */}
           {isChatOpen && (
-            <div className="w-96 p-6 pl-0 overflow-hidden">
+            <div className="w-[420px] min-h-0 flex-shrink-0">
               <AIChat />
             </div>
           )}
-        </div>
+        </main>
       </div>
 
-      {/* Floating button when chat is closed */}
+      {/* Floating AI Button */}
       {!isChatOpen && <AIChat />}
     </div>
   );

@@ -8,9 +8,13 @@ import {
   Bot,
   User,
   ChevronDown,
-  Sparkles
+  Sparkles,
+  MessageCircle
 } from 'lucide-react';
 import { useAI } from '../context/AIContext';
+import { ScrollArea } from './ui/scroll-area';
+import { Button } from './ui/button';
+import { cn } from '@/lib/utils';
 
 export function AIChat() {
   const {
@@ -43,27 +47,27 @@ export function AIChat() {
   // Floating button when closed
   if (!isChatOpen) {
     return (
-      <button
+      <Button
         onClick={toggleChat}
-        className="fixed right-6 bottom-6 w-14 h-14 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-full shadow-lg hover:from-indigo-700 hover:to-purple-700 transition-all hover:scale-105 flex items-center justify-center z-50 group"
+        className="fixed right-6 bottom-6 w-14 h-14 rounded-full shadow-xl shadow-indigo-300 hover:scale-110 z-50"
         title="AIに質問する"
       >
-        <Sparkles size={24} className="group-hover:animate-pulse" />
-      </button>
+        <Sparkles size={24} />
+      </Button>
     );
   }
 
   // Pane mode when open
   return (
-    <div className="h-full bg-white rounded-2xl shadow-lg flex flex-col overflow-hidden">
+    <div className="h-full bg-white rounded-3xl shadow-xl shadow-indigo-100/50 border border-white/50 flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between">
+      <div className="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 text-white flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-            <Bot size={22} />
+          <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
+            <Bot size={20} />
           </div>
           <div>
-            <h3 className="font-bold">AI学習アシスタント</h3>
+            <h3 className="font-bold text-sm">AI学習アシスタント</h3>
             <p className="text-xs text-indigo-200">
               {providers.find(p => p.id === settings.provider)?.name}
             </p>
@@ -72,61 +76,64 @@ export function AIChat() {
         <div className="flex items-center gap-1">
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+            className={cn(
+              "p-2 rounded-lg transition-colors",
+              showSettings ? "bg-white/30" : "hover:bg-white/20"
+            )}
             title="設定"
           >
-            <Settings size={18} />
+            <Settings size={16} />
           </button>
           <button
             onClick={clearMessages}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
             title="履歴を消去"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
           </button>
           <button
             onClick={toggleChat}
             className="p-2 hover:bg-white/20 rounded-lg transition-colors"
             title="閉じる"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
       </div>
 
       {/* Settings Panel */}
       {showSettings && (
-        <div className="p-4 bg-gradient-to-b from-indigo-50 to-white border-b border-indigo-100">
-          <h4 className="font-medium text-gray-700 mb-3 text-sm">API設定</h4>
+        <div className="p-4 bg-slate-50 border-b border-slate-200 flex-shrink-0">
+          <h4 className="font-medium text-slate-700 mb-3 text-sm">API設定</h4>
 
           {/* Provider Selection */}
           <div className="mb-3">
-            <label className="block text-xs text-gray-500 mb-1">プロバイダー</label>
+            <label className="block text-xs text-slate-500 mb-1.5">プロバイダー</label>
             <div className="relative">
               <select
                 value={settings.provider}
                 onChange={(e) => updateSettings({ provider: e.target.value as 'openai' | 'anthropic' | 'google' })}
-                className="w-full p-2.5 border border-indigo-200 rounded-lg appearance-none bg-white pr-8 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="w-full p-2.5 border border-slate-200 rounded-xl appearance-none bg-white pr-8 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
               >
                 {providers.map((p) => (
                   <option key={p.id} value={p.id}>{p.name}</option>
                 ))}
               </select>
-              <ChevronDown size={16} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+              <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
             </div>
           </div>
 
           {/* API Key Input */}
           <div>
-            <label className="block text-xs text-gray-500 mb-1">APIキー</label>
+            <label className="block text-xs text-slate-500 mb-1.5">APIキー</label>
             <input
               type="password"
               value={settings.apiKey}
               onChange={(e) => updateSettings({ apiKey: e.target.value })}
               placeholder={providers.find(p => p.id === settings.provider)?.apiKeyPlaceholder}
-              className="w-full p-2.5 border border-indigo-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              className="w-full p-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
             />
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-[10px] text-slate-400 mt-1.5">
               APIキーはローカルに保存されます
             </p>
           </div>
@@ -134,79 +141,84 @@ export function AIChat() {
       )}
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-gray-50 to-white">
-        {messages.length === 0 && (
-          <div className="text-center text-gray-500 mt-4">
-            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center">
-              <Bot size={32} className="text-indigo-500" />
+      <ScrollArea className="flex-1">
+        <div className="p-4 space-y-4">
+          {messages.length === 0 && (
+            <div className="text-center py-8">
+              <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-2xl flex items-center justify-center">
+                <MessageCircle size={28} className="text-indigo-500" />
+              </div>
+              <p className="font-medium text-slate-700">こんにちは!</p>
+              <p className="text-sm mt-1 text-slate-500">
+                Pythonの学習で分からないことを<br />質問してください
+              </p>
+              <div className="mt-6 space-y-2">
+                <button
+                  onClick={() => sendMessage('変数とは何ですか？')}
+                  className="block w-full text-left p-3 bg-white hover:bg-indigo-50 border border-slate-200 rounded-xl text-sm text-slate-700 transition-all hover:border-indigo-200"
+                >
+                  <span className="text-indigo-500 mr-2">💡</span>変数とは何ですか？
+                </button>
+                <button
+                  onClick={() => sendMessage('for文の使い方を教えてください')}
+                  className="block w-full text-left p-3 bg-white hover:bg-indigo-50 border border-slate-200 rounded-xl text-sm text-slate-700 transition-all hover:border-indigo-200"
+                >
+                  <span className="text-indigo-500 mr-2">💡</span>for文の使い方
+                </button>
+              </div>
             </div>
-            <p className="font-medium text-gray-700">こんにちは!</p>
-            <p className="text-sm mt-1 text-gray-500">
-              Pythonの学習で分からないことを<br />質問してください
-            </p>
-            <div className="mt-4 space-y-2">
-              <button
-                onClick={() => sendMessage('変数とは何ですか？')}
-                className="block w-full text-left p-3 bg-white hover:bg-indigo-50 border border-indigo-100 rounded-xl text-sm text-gray-700 transition-colors"
-              >
-                <span className="text-indigo-500 mr-2">💡</span>変数とは何ですか？
-              </button>
-              <button
-                onClick={() => sendMessage('for文の使い方を教えてください')}
-                className="block w-full text-left p-3 bg-white hover:bg-indigo-50 border border-indigo-100 rounded-xl text-sm text-gray-700 transition-colors"
-              >
-                <span className="text-indigo-500 mr-2">💡</span>for文の使い方
-              </button>
-            </div>
-          </div>
-        )}
+          )}
 
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`chat-message flex gap-3 ${
-              message.role === 'user' ? 'flex-row-reverse' : ''
-            }`}
-          >
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 ${
-              message.role === 'user'
-                ? 'bg-gradient-to-br from-indigo-500 to-purple-500'
-                : 'bg-gradient-to-br from-gray-100 to-gray-200'
-            }`}>
-              {message.role === 'user' ? (
-                <User size={14} className="text-white" />
-              ) : (
-                <Bot size={14} className="text-gray-600" />
+          {messages.map((message) => (
+            <div
+              key={message.id}
+              className={cn(
+                "flex gap-3",
+                message.role === 'user' && "flex-row-reverse"
               )}
+            >
+              <div className={cn(
+                "w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0",
+                message.role === 'user'
+                  ? "bg-gradient-to-br from-indigo-500 to-purple-500"
+                  : "bg-slate-100"
+              )}>
+                {message.role === 'user' ? (
+                  <User size={14} className="text-white" />
+                ) : (
+                  <Bot size={14} className="text-slate-600" />
+                )}
+              </div>
+              <div className={cn(
+                "max-w-[85%] rounded-2xl px-4 py-3",
+                message.role === 'user'
+                  ? "bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-tr-md"
+                  : "bg-slate-100 text-slate-800 rounded-tl-md"
+              )}>
+                <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
+              </div>
             </div>
-            <div className={`max-w-[85%] rounded-2xl px-4 py-3 ${
-              message.role === 'user'
-                ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white rounded-tr-md'
-                : 'bg-white border border-gray-100 text-gray-800 rounded-tl-md shadow-sm'
-            }`}>
-              <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
-            </div>
-          </div>
-        ))}
+          ))}
 
-        {isLoading && (
-          <div className="chat-message flex gap-3">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-              <Bot size={14} className="text-gray-600" />
+          {isLoading && (
+            <div className="flex gap-3">
+              <div className="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center">
+                <Bot size={14} className="text-slate-600" />
+              </div>
+              <div className="bg-slate-100 rounded-2xl rounded-tl-md px-4 py-3">
+                <Loader size={18} className="text-indigo-500 animate-spin" />
+              </div>
             </div>
-            <div className="bg-white border border-gray-100 rounded-2xl rounded-tl-md px-4 py-3 shadow-sm">
-              <Loader size={18} className="text-indigo-500 animate-spin" />
-            </div>
-          </div>
-        )}
+          )}
 
-        <div ref={messagesEndRef} />
-      </div>
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-gray-100 bg-white">
+      <form onSubmit={handleSubmit} className="p-4 border-t border-slate-100 bg-white flex-shrink-0">
         {!settings.apiKey && (
-          <div className="mb-3 p-2.5 bg-amber-50 border border-amber-200 rounded-xl">
+          <div className="mb-3 p-3 bg-amber-50 border border-amber-200 rounded-xl">
             <p className="text-xs text-amber-700">
               ⚠️ APIキーを設定してください（⚙️ボタン）
             </p>
@@ -218,16 +230,16 @@ export function AIChat() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="質問を入力..."
-            className="flex-1 p-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm"
+            className="flex-1 p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none text-sm transition-all"
             disabled={isLoading}
           />
-          <button
+          <Button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="p-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="px-4"
           >
             <Send size={18} />
-          </button>
+          </Button>
         </div>
       </form>
     </div>
